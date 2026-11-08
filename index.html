@@ -773,6 +773,42 @@
         </div>
     </div>
 
+    <!-- ═══════════════ MODAL 8: PROFILE SWITCH PASSWORD SECURITY ═══════════════ -->
+    <div id="switchProfilePasswordModal" class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 modal-backdrop overflow-y-auto">
+        <div class="w-full max-w-sm mx-auto my-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl overflow-hidden fade-in flex flex-col">
+            <div class="px-5 py-4 border-b border-border flex items-center justify-between">
+                <div>
+                    <h3 class="font-bold text-base text-foreground">Switch Profile Security</h3>
+                    <p class="text-xs text-muted-foreground">Password required to switch accounts.</p>
+                </div>
+                <button type="button" onclick="closeSwitchProfilePasswordModal()" class="p-1 rounded-md text-muted-foreground hover:bg-secondary">✕</button>
+            </div>
+            <form onsubmit="event.preventDefault(); verifyAndSwitchProfile();" class="p-5 space-y-4">
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-secondary/50 border border-border/60">
+                    <div id="switchTargetAvatar" class="h-10 w-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shadow-xs flex-shrink-0">
+                        U
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <h4 id="switchTargetName" class="text-sm font-bold text-foreground truncate">User Name</h4>
+                        <p id="switchTargetUserId" class="text-xs text-muted-foreground font-mono truncate">@userid</p>
+                    </div>
+                </div>
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-foreground">Profile Password <span class="text-destructive">*</span></label>
+                        <span class="text-[10px] text-muted-foreground">Required</span>
+                    </div>
+                    <input type="password" id="switchProfilePassword" placeholder="Enter profile password" required autofocus
+                           class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                </div>
+                <div class="pt-3 border-t border-border flex justify-end gap-2">
+                    <button type="button" onclick="closeSwitchProfilePasswordModal()" class="h-9 px-4 rounded-xl border border-input text-xs font-medium hover:bg-secondary">Cancel</button>
+                    <button type="submit" class="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow hover:bg-primary/90">Verify & Switch</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Notifications -->
     <div id="toastContainer" class="fixed top-4 right-4 z-[80] space-y-2 max-w-[90vw]"></div>
 
@@ -938,6 +974,8 @@
         }
     }
 
+    let pendingSwitchTarget = null;
+
     function renderSidebarUserAccounts() {
         const list = document.getElementById('userAccountsList');
         const users = getAuthUsers();
@@ -949,7 +987,7 @@
                 cleanUserId(currentUser.userId).toLowerCase() === cleanUserId(u.userId).toLowerCase()
             );
             return `
-            <div onclick="switchUserAccountByIndex(${index})"
+            <div onclick="requestUserAccountSwitchByIndex(${index})"
                  class="group flex items-center justify-between px-2.5 py-1.5 rounded-lg text-xs cursor-pointer ${isCur ? 'bg-primary text-primary-foreground font-semibold' : 'hover:bg-accent text-foreground'} transition-colors">
                 <div class="flex items-center gap-2 truncate min-w-0 pr-2">
                     <div class="h-6 w-6 rounded-md ${isCur ? 'bg-primary-foreground text-primary' : 'bg-primary/10 text-primary'} flex items-center justify-center font-bold text-[10px] flex-shrink-0">
@@ -969,17 +1007,81 @@
         }).join('');
     }
 
-    function switchUserAccountByIndex(index) {
+    function requestUserAccountSwitchByIndex(index) {
         const users = getAuthUsers();
-        if (index >= 0 && index < users.length) {
-            performUserSwitch(users[index]);
+        if (index < 0 || index >= users.length) return;
+        requestUserAccountSwitch(users[index]);
+    }
+
+    function requestUserAccountSwitch(target) {
+        if (!target) return;
+        // If clicking on current active profile, close popover
+        if (currentUser && (
+            currentUser.userId.toLowerCase() === target.userId.toLowerCase() ||
+            cleanUserId(currentUser.userId).toLowerCase() === cleanUserId(target.userId).toLowerCase()
+        )) {
+            document.getElementById('userSwitcherPopover')?.classList.add('hidden');
+            return;
         }
+
+        // Require password verification to switch profile
+        pendingSwitchTarget = target;
+        document.getElementById('userSwitcherPopover')?.classList.add('hidden');
+
+        const avatarEl = document.getElementById('switchTargetAvatar');
+        if (avatarEl) avatarEl.textContent = getInitials(target.name || target.userId);
+        const nameEl = document.getElementById('switchTargetName');
+        if (nameEl) nameEl.textContent = target.name || target.userId;
+        const idEl = document.getElementById('switchTargetUserId');
+        if (idEl) idEl.textContent = '@' + cleanUserId(target.userId);
+
+        const pwdInput = document.getElementById('switchProfilePassword');
+        if (pwdInput) pwdInput.value = '';
+
+        const m = document.getElementById('switchProfilePasswordModal');
+        if (m) {
+            m.classList.remove('hidden');
+            m.classList.add('flex');
+            setTimeout(() => pwdInput?.focus(), 80);
+        }
+    }
+
+    function closeSwitchProfilePasswordModal() {
+        pendingSwitchTarget = null;
+        const m = document.getElementById('switchProfilePasswordModal');
+        if (m) {
+            m.classList.add('hidden');
+            m.classList.remove('flex');
+        }
+    }
+
+    function verifyAndSwitchProfile() {
+        if (!pendingSwitchTarget) return;
+        const pwdInput = document.getElementById('switchProfilePassword');
+        const pwd = pwdInput ? pwdInput.value : '';
+
+        if (pwd !== pendingSwitchTarget.password) {
+            showToast('Incorrect password for ' + (pendingSwitchTarget.name || pendingSwitchTarget.userId), 'error');
+            if (pwdInput) {
+                pwdInput.value = '';
+                pwdInput.focus();
+            }
+            return;
+        }
+
+        const target = pendingSwitchTarget;
+        closeSwitchProfilePasswordModal();
+        performUserSwitch(target);
+    }
+
+    function switchUserAccountByIndex(index) {
+        requestUserAccountSwitchByIndex(index);
     }
 
     function switchUserAccount(targetUserId) {
         const users = getAuthUsers();
         if (typeof targetUserId === 'number') {
-            return switchUserAccountByIndex(targetUserId);
+            return requestUserAccountSwitchByIndex(targetUserId);
         }
         const cleanTarget = cleanUserId(targetUserId).toLowerCase();
         const rawTarget = String(targetUserId).toLowerCase();
@@ -992,7 +1094,7 @@
             showToast('Profile not found', 'error');
             return;
         }
-        performUserSwitch(target);
+        requestUserAccountSwitch(target);
     }
 
     function performUserSwitch(target) {
@@ -1050,7 +1152,14 @@
     function deleteUserProfileByIndex(index) {
         const users = getAuthUsers();
         if (index >= 0 && index < users.length) {
-            performDeleteUserProfile(users[index]);
+            const target = users[index];
+            const pwd = prompt(`Enter password for "${target.name}" (@${cleanUserId(target.userId)}) to confirm deletion:`);
+            if (pwd === null) return;
+            if (pwd !== target.password) {
+                showToast('Incorrect password. Profile deletion aborted.', 'error');
+                return;
+            }
+            performDeleteUserProfile(target);
         }
     }
 
@@ -1063,6 +1172,12 @@
             cleanUserId(x.userId).toLowerCase() === cleanTarget
         );
         if (target) {
+            const pwd = prompt(`Enter password for "${target.name}" (@${cleanUserId(target.userId)}) to confirm deletion:`);
+            if (pwd === null) return;
+            if (pwd !== target.password) {
+                showToast('Incorrect password. Profile deletion aborted.', 'error');
+                return;
+            }
             performDeleteUserProfile(target);
         }
     }
@@ -1092,15 +1207,10 @@
         saveAuthUsers(remaining);
 
         if (isSelf) {
-            if (remaining.length > 0) {
-                performUserSwitch(remaining[0]);
-                showToast(`Profile "${target.name}" deleted. Switched to ${remaining[0].name}.`, 'info');
-            } else {
-                currentUser = null;
-                localStorage.removeItem(CURRENT_USER_KEY);
-                showLoginView();
-                showToast('Profile deleted. Please sign in or register.', 'info');
-            }
+            currentUser = null;
+            localStorage.removeItem(CURRENT_USER_KEY);
+            showLoginView();
+            showToast(`Profile "${target.name}" deleted. Please sign in to continue.`, 'info');
         } else {
             renderSidebarUserAccounts();
             showToast(`Profile "${target.name}" deleted.`, 'info');
