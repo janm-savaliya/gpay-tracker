@@ -497,6 +497,22 @@
           >
             Sign In
           </button>
+
+          <div
+            class="p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-[11px] text-muted-foreground flex items-center justify-between"
+          >
+            <div>
+              <span class="font-bold text-amber-500 block text-xs">Janm Admin Account</span>
+              <span class="font-mono text-[10px] text-muted-foreground">User ID: admin · Password: 123</span>
+            </div>
+            <button
+              type="button"
+              onclick="fillAdminLogin()"
+              class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-semibold text-[11px] border border-amber-500/20 transition-colors"
+            >
+              Fill Admin
+            </button>
+          </div>
         </form>
 
         <div
@@ -611,6 +627,30 @@
                   <span
                     class="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-mono font-bold"
                     >Live</span
+                  >
+                </button>
+
+                <!-- Admin Tab (Visible only to Janm Admin) -->
+                <button
+                  onclick="switchAppView('admin')"
+                  id="navItem-admin"
+                  class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-all border border-transparent"
+                >
+                  <svg
+                    class="w-3.5 h-3.5 text-amber-500"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                    />
+                  </svg>
+                  <span>Account Directory</span>
+                  <span
+                    class="text-[9px] px-1.5 py-0.5 rounded-full bg-amber-500/10 text-amber-500 font-mono font-bold"
+                    >Admin</span
                   >
                 </button>
               </nav>
@@ -789,17 +829,24 @@
                   >
                     JS
                   </div>
-                  <div class="hidden sm:block text-left max-w-[120px]">
+                  <div class="hidden sm:block text-left max-w-[130px]">
                     <span
                       class="text-xs font-bold text-foreground block truncate leading-tight"
                       id="sidebarDisplayName"
                       >User</span
                     >
-                    <span
-                      class="text-[10px] text-muted-foreground font-mono block truncate"
-                      id="sidebarUserId"
-                      >@user</span
-                    >
+                    <div class="flex items-center gap-1">
+                      <span
+                        class="text-[10px] text-muted-foreground font-mono block truncate"
+                        id="sidebarUserId"
+                        >@user</span
+                      >
+                      <span
+                        id="sidebarUserRole"
+                        class="hidden text-[9px] font-bold px-1.5 py-0.2 rounded-full uppercase tracking-wider bg-amber-500/20 text-amber-500 font-mono"
+                        >Admin</span
+                      >
+                    </div>
                   </div>
                 </div>
                 <button
@@ -864,6 +911,22 @@
                 <path d="m19 9-5 5-4-4-3 3" />
               </svg>
               <span>Cashflow Analytics</span>
+            </button>
+            <button
+              onclick="switchAppView('admin')"
+              id="navItem-admin-mobile"
+              class="hidden flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/40 hover:text-foreground border border-transparent"
+            >
+              <svg
+                class="w-3.5 h-3.5 text-amber-500"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+              </svg>
+              <span>Accounts</span>
             </button>
           </div>
         </div>
@@ -1181,6 +1244,124 @@
             <div class="space-y-3" id="categoryBreakdownList"></div>
           </div>
         </div>
+
+        <!-- ══════════════ VIEW 3: ADMIN USER MANAGEMENT (JANM ADMIN ONLY) ══════════════ -->
+        <div id="viewAdmin" class="hidden space-y-6 fade-in">
+          <!-- Admin Control Header Banner -->
+          <div
+            class="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-card via-card to-amber-500/10 p-5 sm:p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+          >
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span
+                  class="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30"
+                  >Admin Clearance Only</span
+                >
+                <span class="text-xs text-muted-foreground font-medium"
+                  >Janm Admin Console</span
+                >
+              </div>
+              <h3
+                class="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground"
+              >
+                User Account Directory
+              </h3>
+              <p class="text-xs text-muted-foreground mt-1 max-w-xl">
+                Privileged access to view, edit passwords/details, and delete all registered profiles. Other users cannot view this directory.
+              </p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+              <button
+                onclick="openAdminCreateUserModal()"
+                class="h-9 px-4 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs shadow-sm transition-all flex items-center gap-1.5"
+              >
+                <svg
+                  class="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M12 4.5v15m7.5-7.5h-15"
+                  />
+                </svg>
+                <span>+ Create User Account</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Admin Metrics Row -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="p-4 rounded-xl border border-border bg-card">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >Total User Accounts</span
+              >
+              <div class="text-2xl font-black font-mono mt-1 text-foreground" id="adminMetricTotalAccounts">
+                0
+              </div>
+            </div>
+            <div class="p-4 rounded-xl border border-border bg-card">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >System Contact Profiles</span
+              >
+              <div class="text-2xl font-black font-mono mt-1 text-primary" id="adminMetricTotalContacts">
+                0
+              </div>
+            </div>
+            <div class="p-4 rounded-xl border border-border bg-card">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-muted-foreground"
+                >Active Ledger Entries</span
+              >
+              <div class="text-2xl font-black font-mono mt-1 text-emerald-500" id="adminMetricTotalTxns">
+                0
+              </div>
+            </div>
+          </div>
+
+          <!-- Accounts Management Directory Section -->
+          <div class="rounded-2xl border border-border bg-card p-5 sm:p-6 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 class="text-sm font-bold text-foreground">
+                  Registered Profiles & Credentials
+                </h4>
+                <p class="text-xs text-muted-foreground">
+                  Manage login credentials and data partitions.
+                </p>
+              </div>
+              <input
+                type="text"
+                id="adminUserSearchInput"
+                oninput="renderAdminUsersView()"
+                placeholder="Search by name or User ID..."
+                class="h-8 px-3 rounded-lg border border-input bg-background text-xs placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring w-full sm:w-64"
+              />
+            </div>
+
+            <!-- Table -->
+            <div class="overflow-x-auto">
+              <table class="w-full text-xs sm:text-sm">
+                <thead>
+                  <tr
+                    class="border-b border-border bg-muted/40 text-muted-foreground uppercase text-[10px] tracking-wider text-left"
+                  >
+                    <th class="px-4 py-2.5">User Profile</th>
+                    <th class="px-4 py-2.5">Role</th>
+                    <th class="px-4 py-2.5">Password</th>
+                    <th class="px-4 py-2.5">Contacts & Splits</th>
+                    <th class="px-4 py-2.5 text-right">Admin Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody">
+                  <!-- Populated dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
       </main>
     </div>
 
@@ -1415,7 +1596,201 @@
       </div>
     </div>
 
+    <!-- ═══════════════ MODAL: ADMIN CREATE USER ACCOUNT ═══════════════ -->
+    <div
+      id="adminCreateUserModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 modal-backdrop overflow-y-auto"
+    >
+      <div
+        class="w-full max-w-md mx-auto my-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl overflow-hidden fade-in flex flex-col"
+      >
+        <div
+          class="px-5 py-4 border-b border-border flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-bold text-base text-foreground">
+              Create New User Account
+            </h3>
+            <p class="text-xs text-muted-foreground">
+              Add user directly to system with custom credentials.
+            </p>
+          </div>
+          <button
+            type="button"
+            onclick="closeAdminCreateUserModal()"
+            class="p-1 rounded-md text-muted-foreground hover:bg-secondary"
+          >
+            ✕
+          </button>
+        </div>
+        <form
+          onsubmit="
+            event.preventDefault();
+            adminCreateAccountSubmit();
+          "
+          class="p-5 space-y-4"
+        >
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >Full Name <span class="text-destructive">*</span></label
+            >
+            <input
+              type="text"
+              id="adminCreateName"
+              placeholder="e.g. Rahul Sharma"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >User ID (Unique Tag) <span class="text-destructive">*</span></label
+            >
+            <input
+              type="text"
+              id="adminCreateUserId"
+              placeholder="e.g. rahul"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >Password <span class="text-destructive">*</span></label
+            >
+            <input
+              type="password"
+              id="adminCreatePassword"
+              placeholder="Set initial password"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground">Role</label>
+            <select
+              id="adminCreateRole"
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs font-medium shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="user">Regular User (Isolated Directory)</option>
+              <option value="admin">Administrator (Janm Admin Privileges)</option>
+            </select>
+          </div>
+          <div class="pt-3 border-t border-border flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="closeAdminCreateUserModal()"
+              class="h-9 px-4 rounded-xl border border-input text-xs font-medium hover:bg-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow hover:bg-primary/90"
+            >
+              Create Account
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
+    <!-- ═══════════════ MODAL: ADMIN EDIT USER ACCOUNT ═══════════════ -->
+    <div
+      id="adminEditUserModal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-3 sm:p-4 modal-backdrop overflow-y-auto"
+    >
+      <div
+        class="w-full max-w-md mx-auto my-auto rounded-2xl border border-border bg-background text-foreground shadow-2xl overflow-hidden fade-in flex flex-col"
+      >
+        <div
+          class="px-5 py-4 border-b border-border flex items-center justify-between"
+        >
+          <div>
+            <h3 class="font-bold text-base text-foreground">
+              Edit User Account
+            </h3>
+            <p class="text-xs text-muted-foreground">
+              Update profile credentials, role, or reset password.
+            </p>
+          </div>
+          <button
+            type="button"
+            onclick="closeAdminEditUserModal()"
+            class="p-1 rounded-md text-muted-foreground hover:bg-secondary"
+          >
+            ✕
+          </button>
+        </div>
+        <form
+          onsubmit="
+            event.preventDefault();
+            adminEditAccountSubmit();
+          "
+          class="p-5 space-y-4"
+        >
+          <input type="hidden" id="adminEditOriginalUserId" value="" />
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >Display Name <span class="text-destructive">*</span></label
+            >
+            <input
+              type="text"
+              id="adminEditName"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >User ID <span class="text-destructive">*</span></label
+            >
+            <input
+              type="text"
+              id="adminEditUserId"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground"
+              >Password <span class="text-destructive">*</span></label
+            >
+            <input
+              type="text"
+              id="adminEditPassword"
+              required
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm font-mono shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            />
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-foreground">Role</label>
+            <select
+              id="adminEditRole"
+              class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-xs font-medium shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            >
+              <option value="user">Regular User</option>
+              <option value="admin">Administrator (Janm Admin)</option>
+            </select>
+          </div>
+          <div class="pt-3 border-t border-border flex justify-end gap-2">
+            <button
+              type="button"
+              onclick="closeAdminEditUserModal()"
+              class="h-9 px-4 rounded-xl border border-input text-xs font-medium hover:bg-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="h-9 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow hover:bg-primary/90"
+            >
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <!-- Toast Notifications -->
     <div
@@ -1431,8 +1806,8 @@
       const CURRENT_USER_KEY = "gpay_current_user";
 
       const DEFAULT_USERS = [
-        { userId: "admin", name: "Janm Savaliya", password: "123" },
-        { userId: "janm", name: "Janm S.", password: "123" },
+        { userId: "admin", name: "Janm Admin", password: "123", role: "admin" },
+        { userId: "janm", name: "Janm S.", password: "123", role: "user" },
       ];
 
       function cleanUserId(uid) {
@@ -1443,12 +1818,49 @@
           : "";
       }
 
+      function isAdmin() {
+        return (
+          currentUser &&
+          (currentUser.role === "admin" ||
+            cleanUserId(currentUser.userId).toLowerCase() === "admin")
+        );
+      }
+
       function getAuthUsers() {
         let users = JSON.parse(localStorage.getItem(AUTH_USERS_KEY));
         if (!users || !Array.isArray(users) || users.length === 0) {
           users = DEFAULT_USERS;
           localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
         }
+
+        // Ensure Janm Admin account is always present with admin role
+        let adminUser = users.find(
+          (u) => u && cleanUserId(u.userId).toLowerCase() === "admin",
+        );
+        if (!adminUser) {
+          adminUser = {
+            userId: "admin",
+            name: "Janm Admin",
+            password: "123",
+            role: "admin",
+          };
+          users.unshift(adminUser);
+          localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+        } else {
+          let updated = false;
+          if (adminUser.role !== "admin") {
+            adminUser.role = "admin";
+            updated = true;
+          }
+          if (adminUser.name === "Janm Savaliya" || adminUser.name !== "Janm Admin") {
+            adminUser.name = "Janm Admin";
+            updated = true;
+          }
+          if (updated) {
+            localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+          }
+        }
+
         // Auto-heal any user IDs with leading backslashes, slashes, or @ symbols
         let modified = false;
         users.forEach((u) => {
@@ -1512,6 +1924,12 @@
         }
       }
 
+      function fillAdminLogin() {
+        switchAuthTab("login");
+        document.getElementById("loginUserId").value = "admin";
+        document.getElementById("loginPassword").value = "123";
+      }
+
       function loginWithPassword() {
         const rawUid = document.getElementById("loginUserId").value.trim();
         const uid = cleanUserId(rawUid);
@@ -1556,6 +1974,10 @@
       }
 
       function onLoginSuccess(user) {
+        if (cleanUserId(user.userId).toLowerCase() === "admin") {
+          user.role = "admin";
+          user.name = "Janm Admin";
+        }
         currentUser = user;
         localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
         loadUserDataForCurrentAccount();
@@ -1586,7 +2008,11 @@
       function showAppView() {
         document.getElementById("loginView").classList.add("hidden");
         document.getElementById("appView").classList.remove("hidden");
-        switchAppView(appData.currentView || "contacts");
+        updateSidebarUserUI();
+        const defaultView = isAdmin()
+          ? "admin"
+          : appData.currentView || "contacts";
+        switchAppView(defaultView);
         renderContactsViewGrid();
       }
 
@@ -1594,11 +2020,37 @@
         if (!currentUser) return;
         const initials = getInitials(currentUser.name || currentUser.userId);
         const avatarEl = document.getElementById("sidebarAvatar");
-        if (avatarEl) avatarEl.textContent = initials;
+        if (avatarEl) {
+          avatarEl.textContent = initials;
+          if (isAdmin()) {
+            avatarEl.className =
+              "h-7 w-7 rounded-lg bg-amber-500 text-slate-950 flex items-center justify-center font-black text-xs flex-shrink-0 shadow-xs ring-1 ring-amber-400/40";
+          } else {
+            avatarEl.className =
+              "h-7 w-7 rounded-lg bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs flex-shrink-0 shadow-xs";
+          }
+        }
         const nameEl = document.getElementById("sidebarDisplayName");
         if (nameEl) nameEl.textContent = currentUser.name || currentUser.userId;
         const idEl = document.getElementById("sidebarUserId");
         if (idEl) idEl.textContent = "@" + cleanUserId(currentUser.userId);
+
+        const roleEl = document.getElementById("sidebarUserRole");
+        const adminTab = document.getElementById("navItem-admin");
+        const adminTabMob = document.getElementById("navItem-admin-mobile");
+
+        if (isAdmin()) {
+          if (roleEl) {
+            roleEl.classList.remove("hidden");
+            roleEl.textContent = "Admin";
+          }
+          if (adminTab) adminTab.classList.remove("hidden");
+          if (adminTabMob) adminTabMob.classList.remove("hidden");
+        } else {
+          if (roleEl) roleEl.classList.add("hidden");
+          if (adminTab) adminTab.classList.add("hidden");
+          if (adminTabMob) adminTabMob.classList.add("hidden");
+        }
       }
 
       // ─── FORGOT PASSWORD MODAL ───
@@ -1888,17 +2340,27 @@
 
       // ─── VIEW NAVIGATION ───
       function switchAppView(view) {
-        if (!view || (view !== "contacts" && view !== "analytics"))
+        if (view === "admin" && !isAdmin()) {
           view = "contacts";
+        }
+        if (
+          !view ||
+          (view !== "contacts" && view !== "analytics" && view !== "admin")
+        ) {
+          view = isAdmin() ? "admin" : "contacts";
+        }
         appData.currentView = view;
         saveData();
 
         const vContacts = document.getElementById("viewContacts");
         const vAnalytics = document.getElementById("viewAnalytics");
+        const vAdmin = document.getElementById("viewAdmin");
 
-        [vContacts, vAnalytics].forEach((v) => v && v.classList.add("hidden"));
+        [vContacts, vAnalytics, vAdmin].forEach(
+          (v) => v && v.classList.add("hidden"),
+        );
 
-        ["contacts", "analytics"].forEach((t) => {
+        ["contacts", "analytics", "admin"].forEach((t) => {
           const el = document.getElementById("navItem-" + t);
           if (el) {
             if (t === view) {
@@ -1927,7 +2389,351 @@
         } else if (view === "analytics") {
           vAnalytics && vAnalytics.classList.remove("hidden");
           renderAnalyticsView();
+        } else if (view === "admin" && isAdmin()) {
+          vAdmin && vAdmin.classList.remove("hidden");
+          renderAdminUsersView();
         }
+      }
+
+      // ─── ADMIN CONTROL CENTER LOGIC (JANM ADMIN ONLY) ───
+      let adminPasswordMasks = {};
+
+      function adminTogglePassword(idx) {
+        adminPasswordMasks[idx] = !adminPasswordMasks[idx];
+        renderAdminUsersView();
+      }
+
+      function renderAdminUsersView() {
+        if (!isAdmin()) return;
+        const users = getAuthUsers();
+        const search = (
+          document.getElementById("adminUserSearchInput")?.value || ""
+        )
+          .toLowerCase()
+          .trim();
+        const tbody = document.getElementById("adminUsersTableBody");
+
+        // Metrics calculations
+        let totalContacts = 0;
+        let totalTxns = 0;
+
+        const usersWithData = users.map((u) => {
+          const raw =
+            localStorage.getItem(`gpay_multiuser_data_${u.userId}`) ||
+            localStorage.getItem(
+              `gpay_multiuser_data_${cleanUserId(u.userId)}`,
+            );
+          let userPersons = [];
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              userPersons = Array.isArray(parsed.persons) ? parsed.persons : [];
+            } catch (e) {}
+          }
+          const contactsCount = userPersons.length;
+          let userTxnsCount = 0;
+          userPersons.forEach((p) => {
+            userTxnsCount += (p.transactions || []).length;
+          });
+          totalContacts += contactsCount;
+          totalTxns += userTxnsCount;
+          return {
+            ...u,
+            contactsCount,
+            userTxnsCount,
+          };
+        });
+
+        const mAccounts = document.getElementById("adminMetricTotalAccounts");
+        if (mAccounts) mAccounts.textContent = users.length;
+        const mContacts = document.getElementById("adminMetricTotalContacts");
+        if (mContacts) mContacts.textContent = totalContacts;
+        const mTxns = document.getElementById("adminMetricTotalTxns");
+        if (mTxns) mTxns.textContent = totalTxns;
+
+        if (!tbody) return;
+
+        const filtered = usersWithData.filter((u) => {
+          if (!search) return true;
+          return (
+            (u.name && u.name.toLowerCase().includes(search)) ||
+            (u.userId && u.userId.toLowerCase().includes(search)) ||
+            (u.role && u.role.toLowerCase().includes(search))
+          );
+        });
+
+        if (filtered.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="5" class="py-8 text-center text-muted-foreground text-xs">No user accounts found matching your search.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = filtered
+          .map((u, idx) => {
+            const isUserAdmin =
+              u.role === "admin" ||
+              cleanUserId(u.userId).toLowerCase() === "admin";
+            const isCurrent =
+              currentUser &&
+              cleanUserId(currentUser.userId).toLowerCase() ===
+                cleanUserId(u.userId).toLowerCase();
+            const showPwd = adminPasswordMasks[idx];
+
+            return `
+            <tr class="border-b border-border/50 hover:bg-muted/30 transition-colors">
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-2.5">
+                  <div class="h-8 w-8 rounded-lg ${isUserAdmin ? "bg-amber-500 text-slate-950 font-black ring-1 ring-amber-400/40" : "bg-primary/10 text-primary font-bold"} flex items-center justify-center text-xs flex-shrink-0">
+                    ${getInitials(u.name || u.userId)}
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-bold text-xs text-foreground">${u.name || u.userId}</span>
+                      ${isCurrent ? '<span class="text-[9px] px-1.5 py-0.2 rounded-full bg-primary/10 text-primary font-semibold">You</span>' : ""}
+                    </div>
+                    <span class="text-[10px] text-muted-foreground font-mono">@${cleanUserId(u.userId)}</span>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                ${
+                  isUserAdmin
+                    ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-500 border border-amber-500/20">Admin</span>'
+                    : '<span class="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">User</span>'
+                }
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="font-mono text-xs text-foreground select-all">${showPwd ? u.password : "••••••••"}</span>
+                  <button type="button" onclick="adminTogglePassword(${idx})"
+                          class="h-6 w-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors"
+                          title="${showPwd ? "Hide password" : "Show password"}">
+                    ${showPwd ? "🙈" : "👁️"}
+                  </button>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="text-xs">
+                  <span class="font-semibold text-foreground">${u.contactsCount} contact${u.contactsCount === 1 ? "" : "s"}</span>
+                  <span class="text-[10px] text-muted-foreground block font-mono">${u.userTxnsCount} txns</span>
+                </div>
+              </td>
+              <td class="px-4 py-3 text-right">
+                <div class="flex items-center justify-end gap-1.5">
+                  <button type="button" onclick="openAdminEditUserModal('${cleanUserId(u.userId)}')"
+                          class="h-7 px-2.5 rounded-lg border border-border text-xs font-medium hover:bg-secondary transition-colors">
+                    Edit
+                  </button>
+                  ${
+                    isCurrent
+                      ? '<span class="text-[10px] text-muted-foreground px-2 py-1">Active</span>'
+                      : `<button type="button" onclick="adminDeleteUser('${cleanUserId(u.userId)}')"
+                                class="h-7 px-2.5 rounded-lg border border-destructive/20 text-destructive text-xs font-medium hover:bg-destructive hover:text-white transition-colors">
+                          Delete
+                        </button>`
+                  }
+                </div>
+              </td>
+            </tr>`;
+          })
+          .join("");
+      }
+
+      function openAdminCreateUserModal() {
+        document.getElementById("adminCreateName").value = "";
+        document.getElementById("adminCreateUserId").value = "";
+        document.getElementById("adminCreatePassword").value = "";
+        document.getElementById("adminCreateRole").value = "user";
+        const m = document.getElementById("adminCreateUserModal");
+        if (m) {
+          m.classList.remove("hidden");
+          m.classList.add("flex");
+        }
+      }
+
+      function closeAdminCreateUserModal() {
+        const m = document.getElementById("adminCreateUserModal");
+        if (m) {
+          m.classList.add("hidden");
+          m.classList.remove("flex");
+        }
+      }
+
+      function adminCreateAccountSubmit() {
+        const name = document.getElementById("adminCreateName").value.trim();
+        const rawUid = document.getElementById("adminCreateUserId").value.trim();
+        const uid = cleanUserId(rawUid);
+        const pwd = document.getElementById("adminCreatePassword").value;
+        const role = document.getElementById("adminCreateRole").value;
+
+        if (!uid) {
+          showToast("Please enter a valid User ID", "error");
+          return;
+        }
+
+        const users = getAuthUsers();
+        if (
+          users.some(
+            (x) => cleanUserId(x.userId).toLowerCase() === uid.toLowerCase(),
+          )
+        ) {
+          showToast(`User ID "${uid}" already exists`, "error");
+          return;
+        }
+
+        const newUser = { userId: uid, name, password: pwd, role };
+        users.push(newUser);
+        saveAuthUsers(users);
+        closeAdminCreateUserModal();
+        renderAdminUsersView();
+        showToast(`Account created for ${name}!`, "success");
+      }
+
+      function openAdminEditUserModal(userId) {
+        const users = getAuthUsers();
+        const u = users.find(
+          (x) => cleanUserId(x.userId).toLowerCase() === userId.toLowerCase(),
+        );
+        if (!u) {
+          showToast("User not found", "error");
+          return;
+        }
+
+        document.getElementById("adminEditOriginalUserId").value = u.userId;
+        document.getElementById("adminEditName").value = u.name || "";
+        document.getElementById("adminEditUserId").value = cleanUserId(u.userId);
+        document.getElementById("adminEditPassword").value = u.password || "";
+        document.getElementById("adminEditRole").value =
+          u.role === "admin" || cleanUserId(u.userId).toLowerCase() === "admin"
+            ? "admin"
+            : "user";
+
+        const m = document.getElementById("adminEditUserModal");
+        if (m) {
+          m.classList.remove("hidden");
+          m.classList.add("flex");
+        }
+      }
+
+      function closeAdminEditUserModal() {
+        const m = document.getElementById("adminEditUserModal");
+        if (m) {
+          m.classList.add("hidden");
+          m.classList.remove("flex");
+        }
+      }
+
+      function adminEditAccountSubmit() {
+        const origUid = document.getElementById(
+          "adminEditOriginalUserId",
+        ).value;
+        const name = document.getElementById("adminEditName").value.trim();
+        const newUid = cleanUserId(
+          document.getElementById("adminEditUserId").value.trim(),
+        );
+        const pwd = document.getElementById("adminEditPassword").value;
+        const role = document.getElementById("adminEditRole").value;
+
+        if (!newUid) {
+          showToast("Please enter a valid User ID", "error");
+          return;
+        }
+
+        const users = getAuthUsers();
+        const u = users.find(
+          (x) =>
+            cleanUserId(x.userId).toLowerCase() ===
+            cleanUserId(origUid).toLowerCase(),
+        );
+        if (!u) {
+          showToast("User not found", "error");
+          return;
+        }
+
+        // If changing user ID, make sure new ID is not taken by another user
+        if (
+          newUid.toLowerCase() !== cleanUserId(origUid).toLowerCase() &&
+          users.some(
+            (x) => cleanUserId(x.userId).toLowerCase() === newUid.toLowerCase(),
+          )
+        ) {
+          showToast(`User ID "${newUid}" is already taken`, "error");
+          return;
+        }
+
+        // If user ID changed, migrate their data key
+        if (newUid.toLowerCase() !== cleanUserId(origUid).toLowerCase()) {
+          const oldDataKey = `gpay_multiuser_data_${cleanUserId(origUid)}`;
+          const oldData = localStorage.getItem(oldDataKey);
+          if (oldData) {
+            localStorage.setItem(`gpay_multiuser_data_${newUid}`, oldData);
+            localStorage.removeItem(oldDataKey);
+          }
+        }
+
+        u.name = name;
+        u.userId = newUid;
+        u.password = pwd;
+        u.role = role;
+
+        // If updating self
+        if (
+          currentUser &&
+          cleanUserId(currentUser.userId).toLowerCase() ===
+            cleanUserId(origUid).toLowerCase()
+        ) {
+          currentUser = u;
+          localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
+          updateSidebarUserUI();
+        }
+
+        saveAuthUsers(users);
+        closeAdminEditUserModal();
+        renderAdminUsersView();
+        showToast(`Account "${name}" updated successfully!`, "success");
+      }
+
+      function adminDeleteUser(userId) {
+        if (!isAdmin()) return;
+        const cleanTargetId = cleanUserId(userId).toLowerCase();
+        if (
+          currentUser &&
+          cleanUserId(currentUser.userId).toLowerCase() === cleanTargetId
+        ) {
+          showToast("You cannot delete your own active Admin account", "error");
+          return;
+        }
+
+        const users = getAuthUsers();
+        const target = users.find(
+          (x) => cleanUserId(x.userId).toLowerCase() === cleanTargetId,
+        );
+        if (!target) {
+          showToast("Account not found", "error");
+          return;
+        }
+
+        if (
+          !confirm(
+            `Permanently delete account "${target.name}" (@${cleanUserId(target.userId)}) and all their stored contacts & data?`,
+          )
+        ) {
+          return;
+        }
+
+        // Remove their data from localStorage
+        localStorage.removeItem(`gpay_multiuser_data_${target.userId}`);
+        localStorage.removeItem(
+          `gpay_multiuser_data_${cleanUserId(target.userId)}`,
+        );
+
+        // Remove from auth users list
+        const remaining = users.filter(
+          (x) => cleanUserId(x.userId).toLowerCase() !== cleanTargetId,
+        );
+        saveAuthUsers(remaining);
+
+        renderAdminUsersView();
+        showToast(`Account "${target.name}" deleted.`, "info");
       }
 
       // ─── 2. CONTACTS & PEER SETTLEMENT ───
