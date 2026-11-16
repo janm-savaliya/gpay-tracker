@@ -497,22 +497,6 @@
           >
             Sign In
           </button>
-
-          <div
-            class="p-2.5 rounded-xl border border-amber-500/20 bg-amber-500/5 text-[11px] text-muted-foreground flex items-center justify-between"
-          >
-            <div>
-              <span class="font-bold text-amber-500 block text-xs">Janm Admin Account</span>
-              <span class="font-mono text-[10px] text-muted-foreground">User ID: admin · Password: 123</span>
-            </div>
-            <button
-              type="button"
-              onclick="fillAdminLogin()"
-              class="px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-500 font-semibold text-[11px] border border-amber-500/20 transition-colors"
-            >
-              Fill Admin
-            </button>
-          </div>
         </form>
 
         <div
@@ -1922,12 +1906,6 @@
             "inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1 text-xs font-medium text-muted-foreground hover:text-foreground";
           authSubtitle.textContent = "Sign in to access your financial OS";
         }
-      }
-
-      function fillAdminLogin() {
-        switchAuthTab("login");
-        document.getElementById("loginUserId").value = "admin";
-        document.getElementById("loginPassword").value = "123";
       }
 
       function loginWithPassword() {
