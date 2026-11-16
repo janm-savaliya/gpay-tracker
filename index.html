@@ -614,11 +614,12 @@
                   >
                 </button>
 
-                <!-- Admin Tab (Visible only to Janm Admin) -->
+                <!-- Admin Tab (Visible ONLY to Janm Admin) -->
                 <button
                   onclick="switchAppView('admin')"
                   id="navItem-admin"
-                  class="hidden flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-all border border-transparent"
+                  style="display: none;"
+                  class="items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-all border border-transparent"
                 >
                   <svg
                     class="w-3.5 h-3.5 text-amber-500"
@@ -899,7 +900,8 @@
             <button
               onclick="switchAppView('admin')"
               id="navItem-admin-mobile"
-              class="hidden flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/40 hover:text-foreground border border-transparent"
+              style="display: none;"
+              class="flex-1 items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/40 hover:text-foreground border border-transparent"
             >
               <svg
                 class="w-3.5 h-3.5 text-amber-500"
@@ -1803,11 +1805,10 @@
       }
 
       function isAdmin() {
-        return (
-          currentUser &&
-          (currentUser.role === "admin" ||
-            cleanUserId(currentUser.userId).toLowerCase() === "admin")
-        );
+        if (!currentUser || !currentUser.userId) return false;
+        const uid = cleanUserId(currentUser.userId).toLowerCase();
+        // ONLY the dedicated admin account has admin permissions
+        return uid === "admin";
       }
 
       function getAuthUsers() {
@@ -1842,6 +1843,22 @@
           }
           if (updated) {
             localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+          }
+        }
+
+        // Ensure janm and all non-admin users are strictly regular users
+        const janmUser = users.find(
+          (u) => u && cleanUserId(u.userId).toLowerCase() === "janm",
+        );
+        if (janmUser && janmUser.role !== "user") {
+          janmUser.role = "user";
+          localStorage.setItem(AUTH_USERS_KEY, JSON.stringify(users));
+        }
+
+        if (currentUser && cleanUserId(currentUser.userId).toLowerCase() !== "admin") {
+          if (currentUser.role === "admin") {
+            currentUser.role = "user";
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(currentUser));
           }
         }
 
@@ -2019,15 +2036,31 @@
 
         if (isAdmin()) {
           if (roleEl) {
+            roleEl.style.display = "inline-flex";
             roleEl.classList.remove("hidden");
             roleEl.textContent = "Admin";
           }
-          if (adminTab) adminTab.classList.remove("hidden");
-          if (adminTabMob) adminTabMob.classList.remove("hidden");
+          if (adminTab) {
+            adminTab.style.display = "flex";
+            adminTab.classList.remove("hidden");
+          }
+          if (adminTabMob) {
+            adminTabMob.style.display = "flex";
+            adminTabMob.classList.remove("hidden");
+          }
         } else {
-          if (roleEl) roleEl.classList.add("hidden");
-          if (adminTab) adminTab.classList.add("hidden");
-          if (adminTabMob) adminTabMob.classList.add("hidden");
+          if (roleEl) {
+            roleEl.style.display = "none";
+            roleEl.classList.add("hidden");
+          }
+          if (adminTab) {
+            adminTab.style.display = "none";
+            adminTab.classList.add("hidden");
+          }
+          if (adminTabMob) {
+            adminTabMob.style.display = "none";
+            adminTabMob.classList.add("hidden");
+          }
         }
       }
 
@@ -2348,6 +2381,11 @@
               el.className =
                 "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/60 hover:text-foreground transition-all border border-transparent";
             }
+            if (t === "admin") {
+              el.style.display = isAdmin() ? "flex" : "none";
+              if (!isAdmin()) el.classList.add("hidden");
+              else el.classList.remove("hidden");
+            }
           }
           const elMob = document.getElementById("navItem-" + t + "-mobile");
           if (elMob) {
@@ -2357,6 +2395,11 @@
             } else {
               elMob.className =
                 "flex-1 flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-medium text-muted-foreground hover:bg-secondary/40 hover:text-foreground border border-transparent";
+            }
+            if (t === "admin") {
+              elMob.style.display = isAdmin() ? "flex" : "none";
+              if (!isAdmin()) elMob.classList.add("hidden");
+              else elMob.classList.remove("hidden");
             }
           }
         });
